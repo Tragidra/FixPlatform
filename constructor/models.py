@@ -56,13 +56,13 @@ class Orders_fields_values(models.Model):
 
 class Checks_fields(models.Model):
     name = models.TextField()  # Сами опции в формате id - имя
-    group_id = models.IntegerField()
+    price = models.IntegerField()
     created_at = models.DateTimeField()
     updated_at = models.DateTimeField(null=True)
     deleted_at = models.DateTimeField(null=True)
 
 
-class Checks_fields_values(models.Model):
+class Checks_fields_values(models.Model): #Клиент вбивает исключительно объём, value = объём
     order_id = models.IntegerField()
     check_field_id = models.IntegerField()
     value = models.TextField()  # Сами опции в формате id - имя

@@ -62,7 +62,7 @@ class Checks_fields(models.Model):
     deleted_at = models.DateTimeField(null=True)
 
 
-class Checks_fields_values(models.Model): #Клиент вбивает исключительно объём, value = объём
+class Orders_checks_fields_values(models.Model):  # Клиент вбивает исключительно объём, value = объём
     order_id = models.IntegerField()
     check_field_id = models.IntegerField()
     value = models.TextField()  # Сами опции в формате id - имя
@@ -135,5 +135,41 @@ class Chat_texts(models.Model):
     created_at = models.DateTimeField(default=now)
     updated_at = models.DateTimeField(null=True)
     deleted_at = models.DateTimeField(null=True)
+
+
+class Customers_payments(models.Model):  # Подразумевается, что оплаты будут сразу создаваться при оформлении заказа
+    user_id = models.IntegerField()
+    order_id = models.IntegerField()
+    sum = models.FloatField(default=0)
+    status = models.TextField(default='created')
+    number = models.IntegerField()
+    created_at = models.DateTimeField(default=now)
+    updated_at = models.DateTimeField(null=True)
+    deleted_at = models.DateTimeField(null=True)
+
+
+class Files(models.Model):  # Фогографии с объектов
+    order_id = models.IntegerField()
+    path = models.TextField()
+    created_at = models.DateTimeField(default=now)
+    updated_at = models.DateTimeField(null=True)
+    deleted_at = models.DateTimeField(null=True)
+
+
+class Work_stages(models.Model):  # Всевозможные этапы работ
+    text = models.TextField()
+    created_at = models.DateTimeField(default=now)
+    updated_at = models.DateTimeField(null=True)
+    deleted_at = models.DateTimeField(null=True)
+
+
+class Orders_work_stages(models.Model):  # Всевозможные этапы работ
+    work_stages_id = models.IntegerField()
+    order_id = models.IntegerField()
+    status = models.TextField()
+    created_at = models.DateTimeField(default=now)
+    updated_at = models.DateTimeField(null=True)
+    deleted_at = models.DateTimeField(null=True)
+
 
 

@@ -5,7 +5,8 @@ from datetime import datetime
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
-from .models import Users, Repair_packets, Orders, Orders_fields_values, Checks_fields
+from .models import Users, Repair_packets, Orders, Orders_fields_values, Checks_fields, Customers_payments, \
+    Orders_work_stages
 from .serializers import *
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from classes.Converter import DB
@@ -83,9 +84,9 @@ def users_detail(request, id):
         if 'role_id' in data.keys():
             user.role_id = data['role_id']
         if 'referral_id' in data.keys():
-            user.referral_id = data['role_id']
-        if 'bonus' in data.keys():
-            user.role_id = data['role_id']
+            user.referral_id = data['referral_id']
+        # if 'bonus' in data.keys():
+        #     user.role_id = data['bonus']
         if user != old_user:
             user.updated_at = datetime.now().strftime("%Y-%m-%d/%H:%M:%S")
         user.save()
@@ -147,6 +148,10 @@ def orders_interaction(request):
         serializer = OrdersSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            user_id = Converter.queryset_to_values(Users.objects.filter(id=request.data['user_id']).values('id'), 'id')
+            user_referral_owner = Users.objects.get(id=user_id)
+            user_referral_owner.bonus = user_referral_owner.bonus + (float(request.data['square']) * 1000)
+            user_referral_owner.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -204,6 +209,7 @@ def authorize(request):
     else:
         return Response({'status': 'error', 'message': 'Пользователь с введёнными вами данными не найден'})
 
+
 @api_view(['GET', 'POST'])
 def check_fields_list(request):
     if request.method == 'GET':
@@ -220,7 +226,7 @@ def check_fields_list(request):
         except EmptyPage:
             data = paginator.page(paginator.num_pages)
 
-        serializer = Checks_fieldsSerializer(data, context={'request': request}, many=True)
+        serializer = Checks_fields_Serializer(data, context={'request': request}, many=True)
         if data.has_next():
             nextPage = data.next_page_number()
         if data.has_previous():
@@ -232,7 +238,7 @@ def check_fields_list(request):
 
     elif request.method == 'POST':
         data = request.data
-        serializer = Checks_fieldsSerializer(data=data)
+        serializer = Checks_fields_Serializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -247,7 +253,7 @@ def check_fields_detail(request, id):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
-        serializer = Checks_fieldsSerializer(checks_fields, context={'request': request})
+        serializer = Checks_fields_Serializer(checks_fields, context={'request': request})
         return Response(serializer.data)
 
     elif request.method == 'PUT':
@@ -268,4 +274,265 @@ def check_fields_detail(request, id):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view([''])
+@api_view(['GET', 'POST'])
+def payments_list(request):
+    if request.method == 'GET':
+        data = []
+        nextPage = 1
+        previousPage = 1
+        customers_payments = Customers_payments.objects.all()
+        page = request.GET.get('page', 1)
+        paginator = Paginator(customers_payments, 5)
+        try:
+            data = paginator.page(page)
+        except PageNotAnInteger:
+            data = paginator.page(1)
+        except EmptyPage:
+            data = paginator.page(paginator.num_pages)
+
+        serializer = Customers_payments_Serializer(data, context={'request': request}, many=True)
+        if data.has_next():
+            nextPage = data.next_page_number()
+        if data.has_previous():
+            previousPage = data.previous_page_number()
+
+        return Response({'data': serializer.data, 'count': paginator.count, 'numpages': paginator.num_pages,
+                         'nextlink': '/api/customers/?page=' + str(nextPage),
+                         'prevlink': '/api/customers/?page=' + str(previousPage)})
+
+    elif request.method == 'POST':
+        data = request.data
+        serializer = Customers_payments_Serializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def payments_details(request, id):
+    try:
+        customers_payments = Customers_payments.objects.get(pk=id)
+    except Users.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = Customers_payments_Serializer(customers_payments, context={'request': request})
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        old_customers_payments = customers_payments
+        data = request.data
+        if 'user_id' in data.keys():
+            customers_payments.user_id = data['user_id']
+        if 'order_id' in data.keys():
+            customers_payments.order_id = data['order_id']
+        if 'sum' in data.keys():
+            customers_payments.sum = data['sum']
+        if 'status' in data.keys():
+            customers_payments.status = data['status']
+        if 'number' in data.keys():
+            customers_payments.number = data['number']
+        if customers_payments != old_customers_payments:
+            customers_payments.updated_at = datetime.now().strftime("%Y-%m-%d/%H:%M:%S")
+        customers_payments.save()
+        return Response({'status': 'ok'})
+
+
+    elif request.method == 'DELETE':
+        customers_payments.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['GET', 'POST'])
+def payments_list(request):
+    if request.method == 'GET':
+        data = []
+        nextPage = 1
+        previousPage = 1
+        customers_payments = Customers_payments.objects.all()
+        page = request.GET.get('page', 1)
+        paginator = Paginator(customers_payments, 5)
+        try:
+            data = paginator.page(page)
+        except PageNotAnInteger:
+            data = paginator.page(1)
+        except EmptyPage:
+            data = paginator.page(paginator.num_pages)
+
+        serializer = Customers_payments_Serializer(data, context={'request': request}, many=True)
+        if data.has_next():
+            nextPage = data.next_page_number()
+        if data.has_previous():
+            previousPage = data.previous_page_number()
+
+        return Response({'data': serializer.data, 'count': paginator.count, 'numpages': paginator.num_pages,
+                         'nextlink': '/api/customers/?page=' + str(nextPage),
+                         'prevlink': '/api/customers/?page=' + str(previousPage)})
+
+    elif request.method == 'POST':
+        data = request.data
+        serializer = Customers_payments_Serializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def payments_details(request, id):
+    try:
+        customers_payments = Customers_payments.objects.get(pk=id)
+    except Users.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = Customers_payments_Serializer(customers_payments, context={'request': request})
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        old_customers_payments = customers_payments
+        data = request.data
+        if 'user_id' in data.keys():
+            customers_payments.user_id = data['user_id']
+        if 'order_id' in data.keys():
+            customers_payments.order_id = data['order_id']
+        if 'sum' in data.keys():
+            customers_payments.sum = data['sum']
+        if 'status' in data.keys():
+            customers_payments.status = data['status']
+        if 'number' in data.keys():
+            customers_payments.number = data['number']
+        if customers_payments != old_customers_payments:
+            customers_payments.updated_at = datetime.now().strftime("%Y-%m-%d/%H:%M:%S")
+        customers_payments.save()
+        return Response({'status': 'ok'})
+
+
+    elif request.method == 'DELETE':
+        customers_payments.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['GET', 'POST'])
+def work_stages_list(request):
+    if request.method == 'GET':
+        data = []
+        nextPage = 1
+        previousPage = 1
+        work_stages = Work_stages.objects.all()
+        page = request.GET.get('page', 1)
+        paginator = Paginator(work_stages, 5)
+        try:
+            data = paginator.page(page)
+        except PageNotAnInteger:
+            data = paginator.page(1)
+        except EmptyPage:
+            data = paginator.page(paginator.num_pages)
+
+        serializer = Work_stages_Serializer(data, context={'request': request}, many=True)
+        if data.has_next():
+            nextPage = data.next_page_number()
+        if data.has_previous():
+            previousPage = data.previous_page_number()
+
+        return Response({'data': serializer.data, 'count': paginator.count, 'numpages': paginator.num_pages,
+                         'nextlink': '/api/customers/?page=' + str(nextPage),
+                         'prevlink': '/api/customers/?page=' + str(previousPage)})
+
+    elif request.method == 'POST':
+        data = request.data
+        serializer = Work_stages_Serializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def work_stages_details(request, id):
+    try:
+        work_stages = Work_stages.objects.get(pk=id)
+    except Users.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = Work_stages_Serializer(work_stages, context={'request': request})
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        old_work_stages = work_stages
+        data = request.data
+        if 'text' in data.keys():
+            work_stages.text = data['text']
+        if work_stages != old_work_stages:
+            work_stages.updated_at = datetime.now().strftime("%Y-%m-%d/%H:%M:%S")
+        work_stages.save()
+        return Response({'status': 'ok'})
+
+
+    elif request.method == 'DELETE':
+        work_stages.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT) @ api_view(['GET', 'POST'])
+
+
+@api_view(['GET', 'POST'])
+def orders_work_stages_list(request):
+    if request.method == 'GET':
+        data = []
+        nextPage = 1
+        previousPage = 1
+        orders_work_stages = Orders_work_stages.objects.all()
+        page = request.GET.get('page', 1)
+        paginator = Paginator(orders_work_stages, 5)
+        try:
+            data = paginator.page(page)
+        except PageNotAnInteger:
+            data = paginator.page(1)
+        except EmptyPage:
+            data = paginator.page(paginator.num_pages)
+
+        serializer = Orders_work_stages_Serializer(data, context={'request': request}, many=True)
+        if data.has_next():
+            nextPage = data.next_page_number()
+        if data.has_previous():
+            previousPage = data.previous_page_number()
+
+        return Response({'data': serializer.data, 'count': paginator.count, 'numpages': paginator.num_pages,
+                         'nextlink': '/api/customers/?page=' + str(nextPage),
+                         'prevlink': '/api/customers/?page=' + str(previousPage)})
+
+    elif request.method == 'POST':
+        data = request.data
+        serializer = Orders_work_stages_Serializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def orders_work_stages_details(request, id):
+    try:
+        orders_work_stages = Orders_work_stages.objects.get(pk=id)
+    except Users.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = Orders_work_stages_Serializer(orders_work_stages, context={'request': request})
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        old_orders_work_stages = orders_work_stages
+        data = request.data
+        if 'text' in data.keys():
+            orders_work_stages.text = data['text']
+        if orders_work_stages != old_orders_work_stages:
+            orders_work_stages.updated_at = datetime.now().strftime("%Y-%m-%d/%H:%M:%S")
+        orders_work_stages.save()
+        return Response({'status': 'ok'})
+
+
+    elif request.method == 'DELETE':
+        orders_work_stages.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

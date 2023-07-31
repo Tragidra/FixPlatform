@@ -159,23 +159,54 @@ def orders_interaction(request):
 @api_view(['GET', 'PUT', 'DELETE'])
 def order_interraction(request, id):
     try:
-        customer = Orders.objects.get(id=id)
-    except Users.DoesNotExist:
+        orders = Orders.objects.get(id=id)
+    except Orders.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
-        serializer = OrdersSerializer(customer, context={'request': request})
+        serializer = OrdersSerializer(orders, context={'request': request})
         return Response(serializer.data)
 
+
     elif request.method == 'PUT':
-        serializer = OrdersSerializer(customer, data=request.data, context={'request': request})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        old_orders = orders
+
+        data = request.data
+
+        if 'user_id' in data.keys():
+            orders.user_id = data['user_id']
+
+        if 'tyoe' in data.keys():
+            orders.tyoe = data['type']
+
+        if 'address' in data.keys():
+            orders.address = data['address']
+
+        if 'square' in data.keys():
+            orders.square = data['square']
+
+        if 'packet_id' in data.keys():
+            orders.packet_id = data['packet_id']
+
+        if 'numbers_rooms' in data.keys():
+            orders.numbers_rooms = data['numbers_rooms']
+
+        if 'numbers_doors' in data.keys():
+            orders.numbers_doors = data['numbers_doors']
+
+        if 'numbers_toilets' in data.keys():
+            orders.numbers_toilets = data['numbers_toilets']
+
+        if orders != old_orders:
+            orders.updated_at = datetime.now().strftime("%Y-%m-%d/%H:%M:%S")
+
+        orders.save()
+
+        return Response({'status': 'ok'})
 
     elif request.method == 'DELETE':
-        customer.delete()
+        orders.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -249,7 +280,7 @@ def check_fields_list(request):
 def check_fields_detail(request, id):
     try:
         checks_fields = Checks_fields.objects.get(pk=id)
-    except Users.DoesNotExist:
+    except Checks_fields.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
@@ -313,7 +344,7 @@ def payments_list(request):
 def payments_details(request, id):
     try:
         customers_payments = Customers_payments.objects.get(pk=id)
-    except Users.DoesNotExist:
+    except Customers_payments.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
@@ -383,7 +414,7 @@ def work_stages_list(request):
 def work_stages_details(request, id):
     try:
         work_stages = Work_stages.objects.get(pk=id)
-    except Users.DoesNotExist:
+    except Work_stages.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
@@ -445,7 +476,7 @@ def orders_work_stages_list(request):
 def orders_work_stages_details(request, id):
     try:
         orders_work_stages = Orders_work_stages.objects.get(pk=id)
-    except Users.DoesNotExist:
+    except Orders_work_stages.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
@@ -455,8 +486,12 @@ def orders_work_stages_details(request, id):
     elif request.method == 'PUT':
         old_orders_work_stages = orders_work_stages
         data = request.data
-        if 'text' in data.keys():
-            orders_work_stages.text = data['text']
+        if 'work_stages_id' in data.keys():
+            orders_work_stages.work_stages_id = data['work_stages_id']
+        if 'order_id' in data.keys():
+            orders_work_stages.order_id = data['order_id']
+        if 'status' in data.keys():
+            orders_work_stages.status = data['status']
         if orders_work_stages != old_orders_work_stages:
             orders_work_stages.updated_at = datetime.now().strftime("%Y-%m-%d/%H:%M:%S")
         orders_work_stages.save()
@@ -514,7 +549,7 @@ def chats_list(request):
 def chats_details(request, id):
     try:
         chats = Chats.objects.get(pk=id)
-    except Users.DoesNotExist:
+    except Chats.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
@@ -524,8 +559,12 @@ def chats_details(request, id):
     elif request.method == 'PUT':
         old_chats = chats
         data = request.data
-        if 'text' in data.keys():
-            chats.text = data['text']
+        if 'client_id' in data.keys():
+            chats.client_id = data['client_id']
+        if 'manager_id' in data.keys():
+            chats.manager_id = data['manager_id']
+        if 'chat_texts_id' in data.keys():
+            chats.chat_texts_id = data['chat_texts_id']
         if chats != old_chats:
             chats.updated_at = datetime.now().strftime("%Y-%m-%d/%H:%M:%S")
         chats.save()
@@ -576,7 +615,7 @@ def chat_texts_list(request):
 def chat_texts_details(request, id):
     try:
         chat_texts = Chat_texts.objects.get(pk=id)
-    except Users.DoesNotExist:
+    except Chat_texts.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
@@ -586,8 +625,12 @@ def chat_texts_details(request, id):
     elif request.method == 'PUT':
         old_chat_texts = chat_texts
         data = request.data
+        if 'chat_id' in data.keys():
+            chat_texts.chat_id = data['chat_id']
         if 'text' in data.keys():
             chat_texts.text = data['text']
+        if 'autor' in data.keys():
+            chat_texts.autor = data['autor']
         if chat_texts != old_chat_texts:
             chat_texts.updated_at = datetime.now().strftime("%Y-%m-%d/%H:%M:%S")
         chat_texts.save()
@@ -640,7 +683,7 @@ def passports_list(request):
 def passports_details(request, id):
     try:
         passports = Passports.objects.get(pk=id)
-    except Users.DoesNotExist:
+    except Passports.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
@@ -650,8 +693,16 @@ def passports_details(request, id):
     elif request.method == 'PUT':
         old_passports = passports
         data = request.data
-        if 'text' in data.keys():
-            passports.text = data['text']
+        if 'series' in data.keys():
+            passports.series = data['series']
+        if 'number' in data.keys():
+            passports.number = data['number']
+        if 'user_id' in data.keys():
+            passports.user_id = data['user_id']
+        if 'date_of_birth' in data.keys():
+            passports.date_of_birth = data['date_of_birth']
+        if 'registration_place' in data.keys():
+            passports.registration_place = data['registration_place']
         if passports != old_passports:
             passports.updated_at = datetime.now().strftime("%Y-%m-%d/%H:%M:%S")
         passports.save()
@@ -671,3 +722,75 @@ def passports_details(request, id):
 #     profit = Converter.queryset_to_values(Users.objects.filter(id=user_id).values('bonus'), 'bonus')
 #     profit = Users.objects.filter(referral_id=user_id).all()
 #     for i in range(len(profit))
+
+'''Работа с файлами, сделано до ТЗ, поэтому после его получения придётся переписывать большую часть, так как сейчас
+даже нет определённости по поводу хранения файлов'''
+
+@api_view(['GET', 'POST'])
+def files_list(request):
+    if request.method == 'GET':
+        data = []
+        nextPage = 1
+        previousPage = 1
+        files = Files.objects.all()
+        page = request.GET.get('page', 1)
+        paginator = Paginator(files, 5)
+        try:
+            data = paginator.page(page)
+        except PageNotAnInteger:
+            data = paginator.page(1)
+        except EmptyPage:
+            data = paginator.page(paginator.num_pages)
+
+        serializer = Files_Serializer(data, context={'request': request}, many=True)
+        if data.has_next():
+            nextPage = data.next_page_number()
+        if data.has_previous():
+            previousPage = data.previous_page_number()
+
+        return Response({'data': serializer.data, 'count': paginator.count, 'numpages': paginator.num_pages,
+                         'nextlink': '/api/customers/?page=' + str(nextPage),
+                         'prevlink': '/api/customers/?page=' + str(previousPage)})
+
+    elif request.method == 'POST':
+        data = request.data
+        serializer = Files_Serializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def passports_details(request, id):
+    try:
+        files = Files.objects.get(pk=id)
+    except Files.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = Files_Serializer(files, context={'request': request})
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        old_files = files
+        data = request.data
+        if 'order_id' in data.keys():
+            files.order_id = data['order_id']
+        if 'user_id' in data.keys():
+            files.user_id = data['user_id']
+        if 'path' in data.keys():
+            files.path = data['path']
+        if 'comment' in data.keys():
+            files.comment = data['comment']
+        if 'orders_work_stages' in data.keys():
+            files.orders_work_stages = data['orders_work_stages']
+        if files != old_files:
+            files.updated_at = datetime.now().strftime("%Y-%m-%d/%H:%M:%S")
+        files.save()
+        return Response({'status': 'ok'})
+
+
+    elif request.method == 'DELETE':
+        files.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -86,7 +86,7 @@ def users_detail(request, id):
         if 'referral_id' in data.keys():
             user.referral_id = data['referral_id']
         # if 'bonus' in data.keys():
-        #     user.role_id = data['bonus']
+        #     user.role_id = data['bonus'] ручное исправление суммы бонуса заблокировано
         if user != old_user:
             user.updated_at = datetime.now().strftime("%Y-%m-%d/%H:%M:%S")
         user.save()

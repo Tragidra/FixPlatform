@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
-from .models import Users, Orders, Orders_fields_values, Checks_fields, Work_stages
+from .models import Users, Orders, Orders_fields_values, Checks_fields, Work_stages, Chats, Chat_texts, Passports
 
 
 class UsersSerializer(serializers.ModelSerializer):
@@ -53,4 +53,23 @@ class Work_stages_Serializer(serializers.ModelSerializer):
 class Orders_work_stages_Serializer(serializers.ModelSerializer):
     class Meta:
         model = Work_stages
-        fields = ('work_stages_id', 'order_id', 'status',  'created_at', 'updated_at', 'deleted_at')
+        fields = ('work_stages_id', 'order_id', 'status', 'created_at', 'updated_at', 'deleted_at')
+
+
+class Chats_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Chats
+        fields = ('client_id', 'manager_id', 'chat_texts_id', 'created_at', 'updated_at', 'deleted_at')
+
+
+class Chat_texts_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Chat_texts
+        fields = ('chat_id', 'text', 'author', 'created_at', 'updated_at', 'deleted_at')
+
+
+class Passports_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Passports
+        fields = ('series', 'number', 'user_id', 'date_of_birth', 'registration_place', 'created_at', 'updated_at',
+                  'deleted_at')

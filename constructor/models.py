@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.contrib.auth.models import User
@@ -11,7 +10,7 @@ now = datetime.now().strftime("%Y-%m-%d/%H:%M:%S")
 class Users(models.Model):
     name = models.TextField()
     password = models.TextField()
-    passport = models.TextField(null=True)
+    passport_id = models.TextField(null=True)
     phone = models.BigIntegerField()
     email = models.TextField()
     address = models.TextField()
@@ -56,6 +55,7 @@ class Orders_fields_values(models.Model):
 
 class Checks_fields(models.Model):
     name = models.TextField()  # Сами опции в формате id - имя
+    text = models.TextField(null=True)
     price = models.IntegerField()
     created_at = models.DateTimeField(default=now)
     updated_at = models.DateTimeField(null=True)
@@ -66,6 +66,7 @@ class Orders_checks_fields_values(models.Model):  # Клиент вбивает 
     order_id = models.IntegerField()
     check_field_id = models.IntegerField()
     value = models.TextField()  # Сами опции в формате id - имя
+    size = models.FloatField(default=0.00)
     created_at = models.DateTimeField(default=now)
     updated_at = models.DateTimeField(null=True)
     deleted_at = models.DateTimeField(null=True)
@@ -149,8 +150,11 @@ class Customers_payments(models.Model):  # Подразумевается, чт�
 
 
 class Files(models.Model):  # Фогографии с объектов
-    order_id = models.IntegerField()
+    order_id = models.IntegerField(null=True)
+    user_id = models.IntegerField(null=True)
     path = models.TextField()
+    comment = models.TextField(null=True)
+    orders_work_stages = models.TextField(null=True)
     created_at = models.DateTimeField(default=now)
     updated_at = models.DateTimeField(null=True)
     deleted_at = models.DateTimeField(null=True)
@@ -172,4 +176,12 @@ class Orders_work_stages(models.Model):  # Всевозможные этапы �
     deleted_at = models.DateTimeField(null=True)
 
 
-
+class Passports(models.Model):
+    series = models.IntegerField()
+    number = models.IntegerField()
+    user_id = models.IntegerField()
+    date_of_birth = models.DateTimeField()
+    registration_place = models.TextField()
+    created_at = models.DateTimeField(default=now)
+    updated_at = models.DateTimeField(null=True)
+    deleted_at = models.DateTimeField(null=True)

@@ -15,4 +15,12 @@ urlpatterns = [
     path('api/additionalWorks/<int:id>/$', views.check_fields_detail),
     path('api/payments', views.payments_list),
     path('api/payments/<int:id>/$', views.payments_details),
+    path('api/qr', views.create_qr),
+    path('api/chats', views.chats_list),
+    path('api/chats/<int:id>/$', views.chats_details),
+    path('api/chatTexts', views.chat_texts_list),
+    path('api/chatTexts/<int:id>/$', views.chat_texts_details),
+    path('api/passports', views.passports_list),
+    path('api/passports/<int:id>/$', views.passports_details),
+    path('api/refferals', views.passports_details),
 ]

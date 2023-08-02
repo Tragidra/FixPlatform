@@ -83,6 +83,7 @@ class Repair_packets(models.Model):
     name = models.TextField()
     price = models.IntegerField()
     text = models.TextField(null=True)
+    path = models.TextField(null=True)
     created_at = models.DateTimeField(default=now)
     updated_at = models.DateTimeField(null=True)
     deleted_at = models.DateTimeField(null=True)

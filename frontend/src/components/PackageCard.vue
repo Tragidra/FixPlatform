@@ -1,33 +1,43 @@
 <template>
 
   <v-card
+      :color="packets.path"
+      theme="dark"
       class="mx-auto"
       max-width="240"
-      max-height="360"
+      min-height="330"
   >
-    <v-img
-      src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
-      height="100px"
-      cover
-    ></v-img>
     <v-card-text>
       <div>Пакет услуг</div>
       <p class="text-h4 text--primary">
         {{packets.name}}
       </p>
-      <p>adjective</p>
-      <div class="text--primary">
-        relating to or dependent on charity; charitable.<br>
-        "an eleemosynary educational institution."
+    </v-card-text>
+    <v-card-text>
+      <p class="text-h6 text-decoration-underline">
+        {{packets.price}} руб/кв.м</p>
+    </v-card-text>
+    <v-card-text>
+      <div class="font-italic">
+        Качественный ремонт с использованием самых лучшимх материалов, большой выбор и уникальные дизайнерские проекты<br>
       </div>
     </v-card-text>
-    <v-card-actions>
+    <v-card-actions class="pt-0">
       <v-btn
           variant="text"
-          color="teal-accent-4"
+          color="#00FA9A"
           @click="reveal = true"
       >
-        Learn More
+        Узнать подробнее
+      </v-btn>
+      </v-card-actions>
+       <v-card-actions class="pt-0">
+      <v-btn
+          variant="text"
+          color="#00FFFF"
+          @click="selectPacket(packets.id)"
+      >
+        Выбрать
       </v-btn>
     </v-card-actions>
 
@@ -39,23 +49,24 @@
       >
         <v-card-text class="pb-0">
           <p class="text-h4 text--primary">
-            Origin
+            Набор услуг
           </p>
-          <p>late 16th century (as a noun denoting a place where alms were distributed): from medieval Latin eleemosynarius, from late Latin eleemosyna ‘alms’, from Greek eleēmosunē ‘compassion’ </p>
+          <p>{{packets.text}}</p>
         </v-card-text>
         <v-card-actions class="pt-0">
           <v-btn
               variant="text"
-              color="teal-accent-4"
+              color="red"
               @click="reveal = false"
           >
-            Close
+            Закрыть
           </v-btn>
         </v-card-actions>
       </v-card>
     </v-expand-transition>
   </v-card>
 </template>
+
 <script>
 export default {
   name: "PackageCard",
@@ -65,6 +76,11 @@ export default {
   data: () => ({
     reveal: false,
   }),
+  methods: {
+    selectPacket: function (packet){
+
+    }
+  },
 }
 </script>
 <style>

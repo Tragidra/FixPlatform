@@ -86,4 +86,4 @@ class Files_Serializer(serializers.ModelSerializer):
 class Repair_packets_Serializer(serializers.ModelSerializer):
     class Meta:
         model = Repair_packets
-        fields = ('name', 'price', 'text', 'created_at', 'updated_at', 'deleted_at')
+        fields = ('name', 'price', 'text', 'path', 'created_at', 'updated_at', 'deleted_at')

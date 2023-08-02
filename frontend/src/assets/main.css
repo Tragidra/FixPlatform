@@ -1,0 +1,78 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.calculator {
+  background-color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  padding: 20px;
+  max-width: 400px;
+  width: 100%;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+h2 {
+  margin-bottom: 10px;
+}
+
+.package-container,
+.option-container {
+  margin-bottom: 20px;
+}
+
+.package-options,
+.option-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.package-options label,
+.option-list label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.package-options label:hover,
+.option-list label:hover {
+  background-color: #f0f0f0;
+}
+
+.package-options label input,
+.option-list label input {
+  margin-bottom: 5px;
+}
+
+.total {
+  border-top: 2px solid #ccc;
+  padding-top: 10px;
+  text-align: center;
+}
+
+#totalPrice {
+  font-size: 24px;
+  font-weight: bold;
+  color: #007bff;
+  margin-top: 5px;
+}

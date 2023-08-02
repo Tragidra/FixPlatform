@@ -22,5 +22,8 @@ urlpatterns = [
     path('api/chatTexts/<int:id>/$', views.chat_texts_details),
     path('api/passports', views.passports_list),
     path('api/passports/<int:id>/$', views.passports_details),
-    path('api/refferals', views.passports_details),
+    path('api/files', views.files_list),
+    path('api/files/<int:id>/$', views.files_details),
+    path('api/repair_packets', views.repair_packets_list),
+    path('api/repair_packets/<int:id>/$', views.repair_packets_details),
 ]

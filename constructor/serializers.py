@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
-from .models import Users, Orders, Orders_fields_values, Checks_fields, Work_stages, Chats, Chat_texts, Passports, Files
+from .models import Users, Orders, Orders_fields_values, Checks_fields, Work_stages, Chats, Chat_texts, Passports, \
+    Files, Repair_packets
 
 
 class UsersSerializer(serializers.ModelSerializer):
@@ -74,8 +75,15 @@ class Passports_Serializer(serializers.ModelSerializer):
         fields = ('series', 'number', 'user_id', 'date_of_birth', 'registration_place', 'created_at', 'updated_at',
                   'deleted_at')
 
+
 class Files_Serializer(serializers.ModelSerializer):
     class Meta:
         model = Files
         fields = ('order_id', 'user_id', 'path', 'comment', 'orders_work_stages', 'created_at', 'updated_at',
                   'deleted_at')
+
+
+class Repair_packets_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Repair_packets
+        fields = ('name', 'price', 'text', 'created_at', 'updated_at', 'deleted_at')

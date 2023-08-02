@@ -644,6 +644,7 @@ def chat_texts_details(request, id):
 
 '''Непонятно, как проводить верификацию, плэтому пока ограничусь базовыми методами'''
 
+
 @api_view(['GET', 'POST'])
 def passports_list(request):
     if request.method == 'GET':
@@ -726,6 +727,7 @@ def passports_details(request, id):
 '''Работа с файлами, сделано до ТЗ, поэтому после его получения придётся переписывать большую часть, так как сейчас
 даже нет определённости по поводу хранения файлов'''
 
+
 @api_view(['GET', 'POST'])
 def files_list(request):
     if request.method == 'GET':
@@ -762,7 +764,7 @@ def files_list(request):
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
-def passports_details(request, id):
+def files_details(request, id):
     try:
         files = Files.objects.get(pk=id)
     except Files.DoesNotExist:
@@ -793,4 +795,70 @@ def passports_details(request, id):
 
     elif request.method == 'DELETE':
         files.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['GET', 'POST'])
+def repair_packets_list(request):
+    if request.method == 'GET':
+        data = []
+        nextPage = 1
+        previousPage = 1
+        repair_packets = Repair_packets.objects.all()
+        page = request.GET.get('page', 1)
+        paginator = Paginator(repair_packets, 5)
+        try:
+            data = paginator.page(page)
+        except PageNotAnInteger:
+            data = paginator.page(1)
+        except EmptyPage:
+            data = paginator.page(paginator.num_pages)
+
+        serializer = Repair_packets_Serializer(data, context={'request': request}, many=True)
+        if data.has_next():
+            nextPage = data.next_page_number()
+        if data.has_previous():
+            previousPage = data.previous_page_number()
+
+        return Response({'data': serializer.data, 'count': paginator.count, 'numpages': paginator.num_pages,
+                         'nextlink': '/api/customers/?page=' + str(nextPage),
+                         'prevlink': '/api/customers/?page=' + str(previousPage)})
+
+    elif request.method == 'POST':
+        data = request.data
+        serializer = Repair_packets_Serializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def repair_packets_details(request, id):
+    try:
+        repair_packets = Repair_packets.objects.get(pk=id)
+    except Repair_packets.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = Repair_packets_Serializer(repair_packets, context={'request': request})
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        old_repair_packets = repair_packets
+        data = request.data
+        if 'name' in data.keys():
+            repair_packets.order_id = data['order_id']
+        if 'price' in data.keys():
+            repair_packets.user_id = data['user_id']
+        if 'text' in data.keys():
+            repair_packets.path = data['path']
+        if repair_packets != old_repair_packets:
+            repair_packets.updated_at = datetime.now().strftime("%Y-%m-%d/%H:%M:%S")
+        repair_packets.save()
+        return Response({'status': 'ok'})
+
+
+    elif request.method == 'DELETE':
+        repair_packets.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

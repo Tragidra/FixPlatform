@@ -57,6 +57,7 @@ class Checks_fields(models.Model):
     name = models.TextField()  # Сами опции в формате id - имя
     text = models.TextField(null=True)
     price = models.IntegerField()
+    type = models.IntegerField(default=0)  # 1-монтаж, 2-демонтаж, 3-дополнительные работы
     created_at = models.DateTimeField(default=now)
     updated_at = models.DateTimeField(null=True)
     deleted_at = models.DateTimeField(null=True)

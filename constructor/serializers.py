@@ -36,7 +36,7 @@ class OrdersFieldsValuesSerializer(serializers.ModelSerializer):
 class Checks_fields_Serializer(serializers.ModelSerializer):
     class Meta:
         model = Checks_fields
-        fields = ('name', 'price', 'created_at', 'updated_at', 'deleted_at')
+        fields = ('name', 'price', 'text', 'type', 'created_at', 'updated_at', 'deleted_at')
 
 
 class Customers_payments_Serializer(serializers.ModelSerializer):

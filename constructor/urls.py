@@ -26,4 +26,6 @@ urlpatterns = [
     path('api/files/<int:id>/$', views.files_details),
     path('api/repair_packets', views.repair_packets_list),
     path('api/repair_packets/<int:id>/$', views.repair_packets_details),
+    path('api/check_fields', views.check_fields_list),
+    path('api/check_fields/<int:id>/$', views.check_fields_detail),
 ]

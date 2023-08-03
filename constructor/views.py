@@ -243,7 +243,13 @@ def authorize(request):
 
 @api_view(['GET', 'POST'])
 def check_fields_list(request):
-    if request.method == 'GET':
+    data = request.data
+    if request.method == 'POST' and 'mode' in data.keys():
+        mounting = Checks_fields.objects.filter(type=1).values()
+        dismantling = Checks_fields.objects.filter(type=2).values()
+        additional = Checks_fields.objects.filter(type=3).values()
+        return Response({'mounting': mounting, 'dismantling':dismantling, 'additional':additional})
+    elif request.method == 'GET':
         data = []
         nextPage = 1
         previousPage = 1
@@ -293,7 +299,11 @@ def check_fields_detail(request, id):
         if 'name' in data.keys():
             checks_fields.name = data['name']
         if 'price' in data.keys():
-            checks_fields.password = data['password']
+            checks_fields.price = data['price']
+        if 'text' in data.keys():
+            checks_fields.text = data['text']
+        if 'type' in data.keys():
+            checks_fields.type = data['type']
         if checks_fields != old_checks_fields:
             checks_fields.updated_at = datetime.now().strftime("%Y-%m-%d/%H:%M:%S")
         checks_fields.save()

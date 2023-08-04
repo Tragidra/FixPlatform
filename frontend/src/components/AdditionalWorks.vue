@@ -8,6 +8,7 @@
                 <v-row>
                   <v-col v-for="mount in mounting"  cols="12" sm="6">
                     <v-text-field
+                      :disabled="disable"
                       v-model="mount.temp"
                       :hint="mount.text"
                       :label="mount.name"
@@ -26,6 +27,7 @@
                 <v-row>
                   <v-col v-for="dismant in dismantling"  cols="12" sm="6">
                     <v-text-field
+                      :disabled="disable"
                       v-model="dismant.temp"
                       :hint="dismant.text"
                       :label="dismant.name"
@@ -44,6 +46,7 @@
                 <v-row>
                   <v-col v-for="add in additional"  cols="12" sm="6">
                     <v-text-field
+                      :disabled="disable"
                       v-model="add.temp"
                       :hint="add.text"
                       :label="add.name"
@@ -67,6 +70,7 @@
       mounting: [],
       dismantling: [],
       additional: [],
+      disable: [],
     },
     data() {
       return {

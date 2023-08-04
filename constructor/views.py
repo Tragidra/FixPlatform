@@ -814,7 +814,7 @@ def repair_packets_list(request):
         data = []
         nextPage = 1
         previousPage = 1
-        repair_packets = Repair_packets.objects.all()
+        repair_packets = Repair_packets.objects.all().order_by('id')
         page = request.GET.get('page', 1)
         paginator = Paginator(repair_packets, 5)
         try:
